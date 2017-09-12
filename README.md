@@ -1,4 +1,4 @@
-# Project Name
+# Image Processing
 
 Repository for image processing.
 
