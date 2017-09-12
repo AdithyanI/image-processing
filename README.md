@@ -10,7 +10,7 @@ Recommended : Use Visual studio IDE. Follow this [http://opencv-srf.blogspot.de/
 
 ## Usage
 
-> image_processing.exe name_of_image.extension filter_type
+> image_processing.exe [name_of_image.extension] [filter_type]
 
 Filter type : 
 * 0 - Negative
