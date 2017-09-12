@@ -6,7 +6,8 @@ Repository for image processing.
 
 No installation needed if you just need to run the .exe.
 Otherwise, typical installation for C++ environment. You also need OpenCV 2 package.
-Recommended : Use Visual studio IDE. Follow this [http://opencv-srf.blogspot.de/2013/05/installing-configuring-opencv-with-vs.html](tutorial). Use the latest OpenCV version.
+
+Recommended : Use Visual studio IDE. Follow this [tutorial](http://opencv-srf.blogspot.de/2013/05/installing-configuring-opencv-with-vs.html). Use the latest OpenCV version.
 
 ## Usage
 
