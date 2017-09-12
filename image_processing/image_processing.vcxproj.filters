@@ -13,6 +13,18 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\external_tools">
+      <UniqueIdentifier>{0746f916-2d61-4dba-b552-d2b515bced64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\external_tools">
+      <UniqueIdentifier>{40698338-408c-450a-bd36-1c8ab45151e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\external_tools\cartoon">
+      <UniqueIdentifier>{edcb8380-1a24-44eb-bfcf-b8504b27d412}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\external_tools\cartoon">
+      <UniqueIdentifier>{ed7a8d90-73f4-47ae-a1f5-a6c6a5945d9b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -24,6 +36,12 @@
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="external_tools\cartoon\cartoon.h">
+      <Filter>Header Files\external_tools\cartoon</Filter>
+    </ClInclude>
+    <ClInclude Include="external_tools\cartoon\ImageUtils.h">
+      <Filter>Header Files\external_tools\cartoon</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -31,6 +49,12 @@
     </ClCompile>
     <ClCompile Include="image_processing.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="external_tools\cartoon\cartoon.cpp">
+      <Filter>Source Files\external_tools\cartoon</Filter>
+    </ClCompile>
+    <ClCompile Include="external_tools\cartoon\ImageUtils_0.7.cpp">
+      <Filter>Source Files\external_tools\cartoon</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
