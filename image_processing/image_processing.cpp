@@ -2,14 +2,13 @@
 
 #include "opencv2/highgui/highgui.hpp"
 #include <opencv2/imgproc/imgproc.hpp>
-
 #include <opencv2/photo.hpp>
-#include "external_tools/cartoon/cartoon.h"            // Cartoonify a photo.
-#include "external_tools/cartoon/ImageUtils.h" 
 
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "utility.h"
 
 using namespace cv;
 using namespace std;
@@ -43,6 +42,12 @@ public:
             imshow(window_name, image);
         }
     }
+
+    void write(std::string file_name)
+    {
+        imwrite("images/" + file_name + ".jpg", image);
+    }
+
 
 };
 
@@ -189,15 +194,72 @@ public:
         }
     }
 
+    // Overloaded function, that horizontally concantes both the original
+    // and the filtered image. Remove later when you do not need this.
     void write(std::string file_name)
     {
-        Mat newImage;
-        hconcat(image, filtered_image, newImage);
-        imwrite("images/" + file_name + ".jpg", newImage);
+        //Mat newImage;
+        //hconcat(image, filtered_image, newImage);
+        imwrite("images/" + file_name + ".jpg", filtered_image);
     }
 
+    // Helper function that creates a gradient image.   
+    // firstPt, radius and power, are variables that control the artistic effect of the filter.
+    void generateGradient(Mat& mask, Point refPt, double radius, double power)
+    {
+        //Point refPt = Point(mask.size().width / 2, mask.size().height / 2);
+        //double radius = 1.0;
+        //double power = 0.1;
+        double maxImageRad = radius * utility::getMaxDisFromCorners(mask.size(), refPt); 
+        // The radius determines maximum boundary where we can have a value of 1.
 
+        mask.setTo(Scalar(1));
+        double temp_distance;
+
+        for (int i = 0; i < mask.rows; i++)
+        {
+            for (int j = 0; j < mask.cols; j++)
+            {
+                temp_distance = utility::dist(refPt, Point(j, i)) / maxImageRad; 
+                // The farthest away point gives a value of 1, the closest point a value of 0.
+                temp_distance = min(temp_distance, 1.0); 
+                temp_distance = pow(temp_distance, power);
+                mask.at<uchar>(i, j) = unsigned int(temp_distance * 255);
+            }
+        }
+    }
+
+    void vignettify(Point refPt, double radius, double power) { // apply vignette effect for the filter
+
+        Mat background = image.clone();
+        Mat foreground = filtered_image.clone();
+
+        foreground.convertTo(foreground, CV_32FC3);
+        background.convertTo(background, CV_32FC3);
+
+        Mat maskImg(filtered_image.size(), CV_8UC1);
+        generateGradient(maskImg, refPt,  radius,  power);
+        cvtColor(maskImg, maskImg, CV_GRAY2RGB);
+        //imwrite("images/vignette/mask.png", maskImg);
+        maskImg.convertTo(maskImg, CV_32FC3, 1.0/255);
+
+        // Multiply the foreground with the alpha matte
+        multiply(maskImg, foreground, foreground);
+        //imwrite("images/vignette/foreground.png", foreground);
+        
+        // Multiply the background with ( 1 - alpha )
+        multiply(Scalar::all(1.0)-maskImg, background, background);
+        //imwrite("images/vignette/background.png", background);
+
+        // Add the masked foreground and background.
+        add(foreground, background, filtered_image);
+        filtered_image.convertTo(filtered_image, CV_8UC3);
+
+        //imwrite("images/vignette/vignette.png", filtered_image);
+
+    }
 };
+
 
 // main() starts here
 int main(int argc, char** argv)
@@ -221,7 +283,9 @@ int main(int argc, char** argv)
 
     Mat img = imread("images/sample.jpeg", CV_LOAD_IMAGE_UNCHANGED);
 
-
+    string ty = utility::type2str(img.type());
+    printf("Matrix: %s %dx%d \n", ty.c_str(), img.cols, img.rows);
+    
     if (img.empty()) //check whether the image is loaded or not
     {
         cout << "Error : Image cannot be loaded..!!" << endl;
@@ -235,7 +299,7 @@ int main(int argc, char** argv)
         return -1;
     }
 
-
+    /*
     filter negative(img);
     negative.applyFilter(0);
     negative.write("negative");
@@ -260,14 +324,29 @@ int main(int argc, char** argv)
     cartoon_image_1.applyFilter(5);
     cartoon_image_1.write("cartoon_1");
 
-    filter cartoon_image_2(img);
-    cartoon_image_2.applyFilter(6);
-    cartoon_image_2.write("cartoon_2");
 
     filter cartoon_image_3(img);
     cartoon_image_3.applyFilter(7);
     cartoon_image_3.write("cartoon_3");
-    
+    */
+
+    //filter cartoon_image_2(img);
+    //cartoon_image_2.applyFilter(6);
+    //cartoon_image_2.write("cartoon_2");
+
+    for (int i = 1; i <= 3; i = i + 2) {
+        for (int j = 1; j <= 3; j = j + 2) {
+            filter vignette(img);
+            vignette.applyFilter(1);
+            Point refPt(img.size().width * i/4, img.size().height * j/4);
+            double radius = 0.4;
+            double power = 1.2;
+            vignette.vignettify(refPt, radius, power);
+            //vignette.write("vignette/location/vignette_center_" + to_string(radius) + "_" + to_string(power));
+            vignette.write("vignette/location/vignette_center_" + to_string(i) + "_" + to_string(j));
+        }
+    }
+
     waitKey(0);
     return 0;
 }

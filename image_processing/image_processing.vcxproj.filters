@@ -36,11 +36,8 @@
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="external_tools\cartoon\cartoon.h">
-      <Filter>Header Files\external_tools\cartoon</Filter>
-    </ClInclude>
-    <ClInclude Include="external_tools\cartoon\ImageUtils.h">
-      <Filter>Header Files\external_tools\cartoon</Filter>
+    <ClInclude Include="utility.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -50,11 +47,8 @@
     <ClCompile Include="image_processing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="external_tools\cartoon\cartoon.cpp">
-      <Filter>Source Files\external_tools\cartoon</Filter>
-    </ClCompile>
-    <ClCompile Include="external_tools\cartoon\ImageUtils_0.7.cpp">
-      <Filter>Source Files\external_tools\cartoon</Filter>
+    <ClCompile Include="utility.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
