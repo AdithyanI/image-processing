@@ -56,7 +56,7 @@ public:
 // Publicly inherits from the basic function.
 class filter : public basic {
 
-public:
+private:
     Mat filtered_image;     // The filtered image will be stored into this
 
 public:
@@ -258,6 +258,43 @@ public:
         //imwrite("images/vignette/vignette.png", filtered_image);
 
     }
+
+    void dodge(Mat image, Mat mask, Mat dst, int scale) {
+        // Implemented based on the tutorial here : http://www.askaswiss.com/2016/01/how-to-create-pencil-sketch-opencv-python.html
+        // Helper function for edge sketch.
+        divide(image, 255 - mask, dst, scale);
+    }
+
+    void burn(Mat image, Mat mask, Mat dst, int scale) {
+        // Implemented based on the tutorial here : http://www.askaswiss.com/2016/01/how-to-create-pencil-sketch-opencv-python.html
+        // Helper function for edge sketch.
+        divide(255 - image, 255 - mask, dst, scale);
+        dst = 255 - dst;
+    }
+
+
+    void edgeSketch() {
+        // Implemented based on the tutorial here : http://www.askaswiss.com/2016/01/how-to-create-pencil-sketch-opencv-python.html
+        cvtColor(filtered_image, filtered_image, COLOR_BGR2GRAY);
+        Mat img_gray = filtered_image.clone();
+        filtered_image = 255 - filtered_image;
+        GaussianBlur(filtered_image, filtered_image, Size(101, 101), 0.0, 0.0);
+        dodge(img_gray, filtered_image, filtered_image, 256);        
+        Mat img_canvas = imread("canvas.jpg", CV_8UC1);
+        resize(img_canvas, img_canvas, Size(filtered_image.size().width, filtered_image.size().height));
+        imshow("canvas", img_canvas);
+        Mat img_new;
+
+        string ty = utility::type2str(img_canvas.type());
+        printf("Image matrix: %s %dx%d \n", ty.c_str(), img_canvas.cols, img_canvas.rows);
+
+        string ty1 = utility::type2str(filtered_image.type());
+        printf("Image matrix: %s %dx%d \n", ty1.c_str(), filtered_image.cols, filtered_image.rows);
+
+        //addWeighted(filtered_image, 0.5, img_canvas, 0.5, 0.0, filtered_image);
+        multiply(filtered_image, img_canvas, filtered_image, 1.0 / 256);
+    }
+
 };
 
 
@@ -334,6 +371,8 @@ int main(int argc, char** argv)
     //cartoon_image_2.applyFilter(6);
     //cartoon_image_2.write("cartoon_2");
 
+
+    /*
     for (int i = 1; i <= 3; i = i + 2) {
         for (int j = 1; j <= 3; j = j + 2) {
             filter vignette(img);
@@ -346,6 +385,12 @@ int main(int argc, char** argv)
             vignette.write("vignette/location/vignette_center_" + to_string(i) + "_" + to_string(j));
         }
     }
+    */
+
+    filter edgesketch(img);
+    edgesketch.edgeSketch();
+    edgesketch.write("edgesketch/canvas_multiply");
+    edgesketch.compareDisplay();
 
     waitKey(0);
     return 0;
