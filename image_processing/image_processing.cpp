@@ -272,7 +272,6 @@ public:
         dst = 255 - dst;
     }
 
-
     void edgeSketch() {
         // Implemented based on the tutorial here : http://www.askaswiss.com/2016/01/how-to-create-pencil-sketch-opencv-python.html
         cvtColor(filtered_image, filtered_image, COLOR_BGR2GRAY);
@@ -294,6 +293,32 @@ public:
         //addWeighted(filtered_image, 0.5, img_canvas, 0.5, 0.0, filtered_image);
         multiply(filtered_image, img_canvas, filtered_image, 1.0 / 256);
     }
+
+    void contour(int thresh = 100) {
+        // http://docs.opencv.org/2.4/doc/tutorials/imgproc/shapedescriptors/find_contours/find_contours.html
+        /// Convert image to gray and blur it
+
+        cvtColor(filtered_image, filtered_image, CV_BGR2GRAY);
+        GaussianBlur(filtered_image, filtered_image, Size(3, 3), 0.0, 0.0);
+
+        Mat canny_output;
+        vector<vector<Point> > contours;
+        vector<Vec4i> hierarchy;
+
+        /// Detect edges using canny
+        Canny(filtered_image, canny_output, thresh, thresh * 2, 3);
+        /// Find contours
+        findContours(canny_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+
+        /// Draw contours
+        Mat drawing(canny_output.size(), CV_8UC3);
+        drawing = Scalar(255, 255, 255);
+        //drawContours(drawing, contours, -1, color, 2, 8, hierarchy, 0, Point());
+        drawContours(drawing, contours, -1, 0, 3, 8 );
+        GaussianBlur(drawing, drawing, Size(3, 3), 0.0, 0.0);
+        drawing.copyTo(filtered_image);
+    }
+
 
 };
 
@@ -318,11 +343,11 @@ int main(int argc, char** argv)
     // CV_LOAD_IMAGE_UNCHANGED - image-depth=8 bits per pixel in each channel,  no. of channels=unchanged 
     // various possible options exist for this
 
-    Mat img = imread("images/sample.jpeg", CV_LOAD_IMAGE_UNCHANGED);
+    Mat img = imread("images/sample_1.jpg", CV_LOAD_IMAGE_UNCHANGED);
 
     string ty = utility::type2str(img.type());
     printf("Matrix: %s %dx%d \n", ty.c_str(), img.cols, img.rows);
-    
+
     if (img.empty()) //check whether the image is loaded or not
     {
         cout << "Error : Image cannot be loaded..!!" << endl;
@@ -356,7 +381,7 @@ int main(int argc, char** argv)
     filter vertical(img);
     vertical.applyFilter(4);
     vertical.write("vertical");
-    
+
     filter cartoon_image_1(img);
     cartoon_image_1.applyFilter(5);
     cartoon_image_1.write("cartoon_1");
@@ -385,13 +410,17 @@ int main(int argc, char** argv)
             vignette.write("vignette/location/vignette_center_" + to_string(i) + "_" + to_string(j));
         }
     }
-    */
 
     filter edgesketch(img);
     edgesketch.edgeSketch();
     edgesketch.write("edgesketch/canvas_multiply");
     edgesketch.compareDisplay();
-
+    */
+    for (int i = 70; i <= 130; i += 20){
+        filter edgesketch(img);
+        edgesketch.contour(i);
+        edgesketch.write("edgesketch/contour_" + to_string(i));
+    }
     waitKey(0);
     return 0;
 }
