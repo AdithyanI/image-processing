@@ -317,6 +317,19 @@ public:
         drawContours(drawing, contours, -1, 0, 3, 8 );
         GaussianBlur(drawing, drawing, Size(3, 3), 0.0, 0.0);
         drawing.copyTo(filtered_image);
+        Mat img_canvas = imread("canvas.jpg", CV_8UC1);
+        resize(img_canvas, img_canvas, Size(filtered_image.size().width, filtered_image.size().height));
+
+        cvtColor(img_canvas, img_canvas, CV_GRAY2RGB);
+
+
+        string ty = utility::type2str(img_canvas.type());
+        printf("Image matrix: %s %dx%d \n", ty.c_str(), img_canvas.cols, img_canvas.rows);
+
+        string ty1 = utility::type2str(filtered_image.type());
+        printf("Image matrix: %s %dx%d \n", ty1.c_str(), filtered_image.cols, filtered_image.rows);
+
+        multiply(filtered_image, img_canvas, filtered_image, 1.0 / 256);
     }
 
 
@@ -411,15 +424,17 @@ int main(int argc, char** argv)
         }
     }
 
+
     filter edgesketch(img);
     edgesketch.edgeSketch();
     edgesketch.write("edgesketch/canvas_multiply");
     edgesketch.compareDisplay();
     */
+
     for (int i = 70; i <= 130; i += 20){
         filter edgesketch(img);
         edgesketch.contour(i);
-        edgesketch.write("edgesketch/contour_" + to_string(i));
+        edgesketch.write("edgesketch/contour_canvas_" + to_string(i));
     }
     waitKey(0);
     return 0;
